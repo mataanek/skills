@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "installed": {
+    "llava": {
+      "source": "official",
+      "identifier": "official/mlops/llava",
+      "trust_level": "builtin",
+      "scan_verdict": "caution",
+      "content_hash": "sha256:55efff60eb814f97",
+      "install_path": "mlops/llava",
+      "files": [
+        "SKILL.md",
+        "references/training.md"
+      ],
+      "metadata": {},
+      "installed_at": "2026-04-15T15:50:04.427436+00:00",
+      "updated_at": "2026-04-15T15:50:04.427450+00:00"
+    },
+    "hyperframes": {
+      "source": "official",
+      "identifier": "official/creative/hyperframes",
+      "trust_level": "builtin",
+      "scan_verdict": "caution",
+      "content_hash": "sha256:06cf6f71523973d2",
+      "install_path": "creative/hyperframes",
+      "files": [
+        "SKILL.md",
+        "scripts/setup.sh",
+        "references/website-to-video.md",
+        "references/composition.md",
+        "references/troubleshooting.md",
+        "references/cli.md",
+        "references/features.md",
+        "references/gsap.md"
+      ],
+      "metadata": {},
+      "installed_at": "2026-05-06T07:01:47.734523+00:00",
+      "updated_at": "2026-05-06T07:01:47.734534+00:00"
+    }
+  }
+}
