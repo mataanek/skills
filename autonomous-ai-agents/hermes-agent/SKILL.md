@@ -126,7 +126,38 @@ hermes skills uninstall N   Remove a hub skill
 hermes skills publish PATH  Publish to registry
 hermes skills browse        Browse all available skills
 hermes skills tap add REPO  Add a GitHub repo as skill source
-```
+hermes skills tap add REPO  Add a GitHub repo as skill source
+
+### Using Git for skills and wiki directories
+
+To track your Hermes skills and wiki in a Git repository (e.g., for backup, synchronization, or collaboration):
+
+1. **For skills directory (~/.hermes/skills):**
+   ```bash
+   cd ~/.hermes/skills
+   git init
+   git remote add origin <your-repo-url>
+   git fetch origin
+   # If repo is empty, push current content:
+   git add .
+   git commit -m "Initial Hermes skills"
+   git push -u origin main   # or master
+   # If repo has content, checkout or merge as needed
+   ```
+
+2. **For wiki directory (~/.hermes/wiki):**
+   Repeat the same steps in `~/.hermes/wiki`.
+
+3. **Workflow:**
+   - To get updates: `git pull` in each directory.
+   - To save changes: commit then `git push`.
+   - Hermes continues to read skills and wiki from these directories automatically.
+
+4. **Authentication:** Use SSH key or HTTPS with personal access token (PAT) stored securely. For SSH, generate a key and add to GitHub; for HTTPS with PAT, use URL format `https://<PAT>@github.com/user/repo.git`.
+
+5. **Branches:** You may use separate branches (e.g., `skills`, `wiki`) to avoid conflicts if using the same repo for both.
+
+See also: `hermes skills tap add REPO` for adding a GitHub repo as a source for the skills hub (different from tracking the skills directory itself).
 
 ### MCP Servers
 
