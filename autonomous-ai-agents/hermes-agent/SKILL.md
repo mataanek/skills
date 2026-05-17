@@ -159,6 +159,63 @@ To track your Hermes skills and wiki in a Git repository (e.g., for backup, sync
 
 See also: `hermes skills tap add REPO` for adding a GitHub repo as a source for the skills hub (different from tracking the skills directory itself).
 
+### Automating synchronization with cron jobs
+
+To keep your skills, wiki, scripts, and workflows directories automatically in sync with your Git repository, you can set up a cron job that runs a synchronization script.
+
+Example script (`~/.hermes/scripts/sync_hermes_repos.sh`):
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+log() {
+    echo "[$(date --iso-8601=seconds)] $*"
+}
+
+sync_repo() {
+    local dir="$1"
+    local branch="$2"
+    log "Syncing $dir (branch $branch)"
+    cd "$dir"
+    git checkout "$branch"
+    git fetch origin
+    if git rev-parse "@{u}" >/dev/null 2>&1 && [ "$(git rev-parse @)" != "$(git rev-parse @{u})" ]; then
+        log "Local branch is behind remote, fast-forwarding"
+        git merge --ff-only @{u}
+    fi
+    if ! git diff-index --quiet HEAD --; then
+        log "Local changes detected, committing"
+        git add -A
+        git commit -m "Auto-sync: $(date --iso-8601=seconds)" || true
+    fi
+    if git rev-parse "@{u}" >/dev/null 2>&1; then
+        log "Attempting to push"
+        git push || {
+            log "Push failed, trying to pull --rebase and push again"
+            git pull --rebase origin "$branch"
+            git push
+        }
+    fi
+    log "Finished syncing $dir"
+}
+
+# Sync all directories
+sync_repo "/home/mataanek/.hermes/skills" "skills"
+sync_repo "/home/mataanek/.hermes/wiki" "wiki"
+sync_repo "/home/mataanek/.hermes/scripts" "scripts"
+sync_repo "/home/mataanek/.hermes/workflows" "workflows"
+```
+
+Make the script executable: `chmod +x ~/.hermes/scripts/sync_hermes_repos.sh`
+
+Then add a cron job via `hermes cron create`:
+```
+hermes cron create "0 0,6,12,18 * * *"   # every 6 hours
+```
+When prompted, provide the script path as `sync_hermes_repos.sh` (relative to `~/.hermes/scripts/`).
+
+This will automatically commit local changes and pull remote changes at the specified intervals.
+
 ### MCP Servers
 
 ```bash
@@ -643,6 +700,7 @@ As documented in `team-agents.md`, Hermes operates with a specialized team struc
 
 See `team-agents.md` for complete roster, responsibilities, handoff rules, and coordination mechanisms.
 See `references/cron-job-delegation.md` for specific guidance on delegating cron job management to wux per team workflow.
+See `references/automated-git-sync.md` for details on the automated Git synchronization system for Hermes directories.
 See `references/cron-job-delegation.md` for guidance on delegating cron job management to wux per team workflow.
 
 ### One-Shot Mode
@@ -907,3 +965,5 @@ When operating in sessions with mataanek, follow these specific preferences:
 - **Delegation adherence**: Strictly follow the team workflow (nix/hex/wux). Nix handles task framing/prioritization/communication only. Delegate all file operations, wiki maintenance, path handling, and repetitive execution to hex or wux.
 - **Tool usage**: Prefer simple single-solution approaches over multiple options. Use TTS/audio playable directly in chat when appropriate.
 - **Error handling**: When tools fail, clearly state what blocked the operation and explain the blocking issue.
+- **Czech language quality**: When responding in Czech, the agent may utilize a Czech language checking tool (language-tool-python) to improve grammar, spelling, and style. This is optional and can be toggled via configuration or invoked manually via the `czech_check.py` script.
+- **Czech language quality**: When responding in Czech, the agent may utilize a Czech language checking tool (language-tool-python) to improve grammar, spelling, and style. This is optional and can be toggled via configuration or invoked manually via the `czech_check.py` script.

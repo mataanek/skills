@@ -76,6 +76,19 @@
     "use_count": 1,
     "view_count": 2
   },
+  "czech-corrector": {
+    "archived_at": null,
+    "created_at": "2026-05-17T16:23:31.424591+00:00",
+    "created_by": null,
+    "last_patched_at": "2026-05-17T16:25:12.183856+00:00",
+    "last_used_at": "2026-05-17T17:47:37.342859+00:00",
+    "last_viewed_at": "2026-05-17T17:47:37.340074+00:00",
+    "patch_count": 2,
+    "pinned": false,
+    "state": "active",
+    "use_count": 3,
+    "view_count": 3
+  },
   "freshrss-news-AI-digest": {
     "archived_at": null,
     "created_at": "2026-05-15T12:48:18.064214+00:00",
@@ -94,13 +107,13 @@
     "created_at": "2026-05-13T16:26:45.400981+00:00",
     "created_by": null,
     "last_patched_at": "2026-05-15T19:24:01.562946+00:00",
-    "last_used_at": "2026-05-17T11:21:49.714770+00:00",
-    "last_viewed_at": "2026-05-17T11:21:49.711819+00:00",
+    "last_used_at": "2026-05-17T17:30:35.566487+00:00",
+    "last_viewed_at": "2026-05-17T17:30:35.555515+00:00",
     "patch_count": 10,
     "pinned": false,
     "state": "active",
-    "use_count": 36,
-    "view_count": 36
+    "use_count": 37,
+    "view_count": 37
   },
   "garmin-connect": {
     "archived_at": null,
@@ -119,14 +132,14 @@
     "archived_at": null,
     "created_at": "2026-05-05T19:16:14.689212+00:00",
     "created_by": null,
-    "last_patched_at": "2026-05-06T17:10:17.229318+00:00",
-    "last_used_at": "2026-05-16T21:02:41.463506+00:00",
-    "last_viewed_at": "2026-05-16T21:02:41.460588+00:00",
-    "patch_count": 7,
+    "last_patched_at": "2026-05-17T17:49:26.755090+00:00",
+    "last_used_at": "2026-05-17T17:48:31.701566+00:00",
+    "last_viewed_at": "2026-05-17T17:48:31.690259+00:00",
+    "patch_count": 8,
     "pinned": false,
     "state": "active",
-    "use_count": 20,
-    "view_count": 20
+    "use_count": 21,
+    "view_count": 21
   },
   "hue-control": {
     "archived_at": null,
@@ -172,12 +185,12 @@
     "created_at": "2026-05-16T19:28:29.477850+00:00",
     "created_by": "agent",
     "last_patched_at": "2026-05-16T22:09:48.443681+00:00",
-    "last_used_at": "2026-05-17T10:00:04.170567+00:00",
+    "last_used_at": "2026-05-17T16:00:45.227845+00:00",
     "last_viewed_at": "2026-05-16T22:09:28.669492+00:00",
     "patch_count": 9,
     "pinned": false,
     "state": "active",
-    "use_count": 17,
+    "use_count": 18,
     "view_count": 8
   },
   "nix-image-generation-protocol": {

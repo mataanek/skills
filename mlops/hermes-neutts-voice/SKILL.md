@@ -58,6 +58,14 @@ If you're not hearing the audio directly in your chat interface (seeing it as a 
 - The voice_compatible flag is set to true in the config, which is required for inline playback in supported platforms.
 - For platform-specific quirks (e.g., Telegram), see references/telegram.md.
 
+### Profile files not found
+If you see errors like "Reference audio not found at: /home/mataanek/.hermes/home/.hermes/profiles/nix/nix.wav" or "Reference codes not found at: .../ref_codes.pt":
+- The skill expects profile data under `~/.hermes/profiles/<profile>/`.
+- Ensure the directory `~/.hermes/profiles/<profile>/` exists (create it if needed).
+- Place a reference audio file named `<profile>.wav` (e.g., `nix.wav`) in that directory.
+- Run the caching script: `hermes run mlops/hermes-neutts-voice.cache_neutts_ref` (or directly execute `~/.hermes/skills/mlops/hermes-neutts-voice/scripts/cache_neutts_ref.py` with `HERMES_ACTIVE_PROFILE=<profile>` set).
+- See `references/profile_setup.md` for detailed steps.
+
 ### Format selection
 - The TTS provider supports ogg, wav, and mp3 output formats via the `output_format` setting in `custom_neutts` config.
 - All formats should work for inline playback where supported - choose based on your platform's preferences and your quality/size needs.
