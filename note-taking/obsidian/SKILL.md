@@ -3,11 +3,13 @@ name: obsidian
 description: Read, search, and create notes in the Obsidian vault.
 ---
 
-# Obsidian Vault
+## Location:
 
 **Location:** Set via `OBSIDIAN_VAULT_PATH` environment variable. If unset, defaults to `/home/mataanek/.hermes/wiki`.
 
 Note: Vault paths may contain spaces - always quote them.
+
+⚠️ **Important:** Always verify the wiki path before saving files. A common mistake is using `/home/mataanek/wiki/` instead of `/home/mataanek/.hermes/wiki/`. Check the Hermes config under `skills.config.wiki.path` to confirm the correct location.
 
 ## Read a note
 
