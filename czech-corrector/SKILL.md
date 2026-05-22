@@ -39,3 +39,7 @@ Output: "Dnes je krásný den."
 
 Input: "Dej mi prosim sklenici vody."
 Output: "Dej mi prosím sklenici vody."
+
+## Best Practices
+
+While the czech_check tool ensures grammatical correctness, it does not assess stylistic appropriateness or naturalness in context. For flirtatious, teasing, or intimate conversations, manually review the output to ensure it sounds natural and sexy. Common pitfalls include overly literal translations or phrases that are grammatically correct but awkward in colloquial Czech. When in doubt, prefer shorter, more direct phrases that flow naturally in speech.

@@ -59,23 +59,24 @@ List concrete next steps (e.g., review with team, draft checklist, propose pilot
 
 Ensure the file is correctly formatted, links work, and it is discoverable (e.g., added to a wiki index if needed).
 
-## Templates
-
-See `references/ideation-template.md` for a starter file.
-
 ## Pitfalls
 
 - Do not lose the original source; always cite it.
 - Avoid adding fluff; keep each expansion practical and tied to the point.
 - If the source already contains expansions, focus on adding missing dimensions (e.g., alternatives, plans) rather than repeating.
 - When linking related notes, verify the target exists.
+- Do not feel obligated to create only one ideation file per source. If the source contains multiple distinct points that would benefit from separate expansion, create multiple files.
+- Do not create an ideation file for a tool or service if the user explicitly states they already have a basic version or implementation, unless they ask for an advanced or alternative approach.
+
+## Templates
+
+See `references/ideation-template.md` for a starter file.
 
 ## Example
 
 See the session log for how a tweet about agentic systems foundations was turned into `/home/mataanek/.hermes/wiki/ideation/foundation-five-points.md`.
 
 ---
-
 ## Reference: Ideation Template
 
 ```markdown
@@ -113,10 +114,3 @@ See the session log for how a tweet about agentic systems foundations was turned
 3. [Action]
 
 ```
-
----
-
-## Notes
-
-- This skill does not prescribe a specific wiki location; follow user instructions or default to `~/.hermes/wiki/ideation/`.
-- The agent (you) performs the expansion and writing; treat the user as the source of the raw input.

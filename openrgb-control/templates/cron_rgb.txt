@@ -1,0 +1,5 @@
+# Example cron entries for OpenRGB control
+# Turn RGB lights off at 22:00 daily
+0 22 * * * /home/mataanek/.local/bin/rgblightctl off >/dev/null 2>&1
+# Turn RGB lights on at 07:00 daily
+0 7 * * * /home/mataanek/.local/bin/rgblightctl on >/dev/null 2>&1

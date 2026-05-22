@@ -16,16 +16,9 @@ This skill provides a complete workflow for establishing a persistent, low-maint
 
 ## Overview
 
-Garmin Connect uses OAuth 1.0a and OAuth 2.0 for authentication. After initial login (which may require SMS 2FA), the `garminconnect` Python library saves tokens that can be reused and refreshed automatically, eliminating the need for repeated SMS prompts.
+ Garmin Connect uses OAuth 1.0a and OAuth 2.0 for authentication. After initial login (which may require SMS 2FA), the `garminconnect` Python library saves tokens that can be reused and refreshed automatically, eliminating the need for repeated SMS prompts.
 
-## When to Use This Skill
-
-- You need continuous access to Garmin Connect data (heart rate, steps, stress, sleep, etc.)
-- You want to avoid entering SMS codes every time you run a script
-- You're building a coaching dashboard or real-time monitoring system
-- You're operating in a headless environment (WSL, server, etc.) where interactive prompts aren't feasible
-
-## Workflow Steps\n\n### 1. One-Time Initial Setup (Interactive)\n\nThis step must be performed once on a machine with a functional TTY (terminal) where you can enter credentials and SMS codes.\n\nSee `references/interactive_login_one_liner.md` for the exact command to run.\n\nAfter successful login, two token files will be created in `~/.garminconnect/`:\n- `oauth1_token.json`\n- `oauth2_token.json`\n\n### 2. Validate and Deploy Tokens to Target Environment\n\nAfter generating tokens, **verify they are valid** before copying:\n\n**oauth1_token.json** must contain:\n```json\n{\n  \"csrf_token\": \"actual_non_empty_string\"\n}\n```\n\n**oauth2_token.json** must contain:\n```json\n{\n  \"access_token\": \"actual_token_string\",\n  \"refresh_token\": \"actual_token_string\",\n  \"expires_at\": 1735689600,\n  \"token_type\": \"Bearer\",\n  \"scope\": \"\"\n}\n```\n\nWhere `expires_at` is a future Unix timestamp (current time + typically ~1 hour).\n\nIf you see `\"csrf_token\": null` or missing/empty values, or `expires_at`: 0, your tokens are invalid and you must repeat step 1.\n\nCopy the **validated** two token files from step 1 to the same path (`~/.garminconnect/`) on your target system (WSL, server, etc.) where you'll run the persistent connection.\n\n### 3. Persistent Connection Script (Non-Interactive)\n\nUse this script for continuous data access. It handles token refresh automatically and only requires interactive input if tokens fully expire (rare).
+ ## Limitations and Pitfalls\n\n- **TTY REQUIRED for Token Generation**: The interactive login process (OAuth flow) **requires a terminal with TTY**. In headless environments (e.g., WSL without a terminal, cron jobs, or SSH without `-t`), token generation **will fail with EOFError**. \n  - **MANDATORY PROCEDURE**: Generate tokens ONLY on a machine with TTY (Windows PowerShell recommended for SMS entry) where you can complete the full interactive login. **Never attempt token generation in headless WSL environments.**\n  - **VERIFICATION IS NON-NEGOTIABLE**: Immediately after token generation, you **MUST verify** the token files contain:\n    * A non-empty string in `oauth1_token.json.csrf_token` (not null or \"\")\n    * A future Unix timestamp in `oauth2_token.json.expires_at` (not 0 or expired)\n  - **Copy ONLY verified tokens** to your target environment. Copying unverified tokens leads to persistent script failures and repeated interactive login requirements.\n\n ## When to Use This Skill\n\n- You need continuous access to Garmin Connect data (heart rate, steps, stress, sleep, etc.)\n- You want to avoid entering SMS codes every time you run a script\n- You're building a coaching dashboard or real-time monitoring system\n- You're operating in a headless environment (WSL, server, etc.) where interactive prompts aren't feasible\n- **CRITICAL**: You understand that token generation MUST occur in a TTY environment (Windows PowerShell recommended) and tokens MUST be verified before copying to your target environment\n\n## Workflow Steps\\\\n\\\\n### 1. One-Time Initial Setup (Interactive - RECOMMENDED ON WINDOWS HOST)\\\\n\\\\n**For headless environments like WSL, perform this step on a Windows host (or any machine with TTY) where you can enter credentials and SMS codes.** This avoids the `EOFError` that occurs in non-interactive terminals.\\\\n\\\\nSee `references/interactive_login_one_liner.md` for the exact command to run.\\\\n\\\\nAfter successful login, two token files will be created in `~/.garminconnect/` (on the Windows host):\\\\n- `oauth1_token.json`\\\\n- `oauth2_token.json`\\\\n\\\\n### 2. Verify Token Validity (CRITICAL STEP - DO ON WINDOWS HOST)\\n\\\\n**Before copying tokens to your target environment (WSL), you MUST verify they are valid on the Windows host.** Invalid tokens will cause persistent scripts to fail and require repeated interactive logins.\\\\n\\\\nUse the verification script:\\\\n```bash\\\\npython3 /home/mataanek/.hermes/skills/mlops/garmin-connect/references/token_verification.md\\\\n```\\\\n\\\\nOr run the embedded verification script directly:\\\\n\\\\n**oauth1_token.json** must contain:\\\\n```json\\\\n{\\\\n  \\\\\\\"csrf_token\\\\\\\": \\\\\\\"actual_non_empty_string\\\\\\\"\\\\n}\\\\n```\\\\n\\\\n**oauth2_token.json** must contain:\\\\n```json\\\\n{\\\\n  \\\\\\\"access_token\\\\\\\": \\\\\\\"actual_token_string\\\\\\\",\\\\n  \\\\\\\"refresh_token\\\\\\\": \\\\\\\"actual_token_string\\\\\\\",\\\\n  \\\\\\\"expires_at\\\\\\\": 1735689600,\\\\n  \\\\\\\"token_type\\\\\\\": \\\\\\\"Bearer\\\\\\\",\\\\n  \\\\\\\"scope\\\\\\\": \\\\\\\"\\\\\\\"\\\\n}\\\\n```\\\\n\\\\nWhere `expires_at` is a future Unix timestamp (current time + typically ~1 hour).\\\\n\\\\nIf you see `\\\\\\\"csrf_token\\\\\\\": null` or missing/empty values, or `expires_at`: 0, your tokens are invalid and you must repeat step 1 on the Windows host.\\\\n\\\\n### 3. Deploy Validated Tokens to Target Environment\\\\n\\\\nCopy the **verified** two token files from the Windows host to the same path (`~/.garminconnect/`) on your target system (WSL, server, etc.) where you'll run the persistent connection.\\\\n\\\\n**Important Path Handling for WSL:**\\\\n- When copying from Windows PowerShell to WSL, use the `\\\\wsl$\\` path format (e.g., `\\\\wsl$\\Ubuntu\\home\\mataanek\\.hermes\\.garminconnect\\`)\\\\n- Do NOT use `/mnt/c/` style paths when copying from PowerShell to WSL - they won't work correctly\\\\n- From PowerShell: `copy C:\\Users\\mataa\\.garminconnect\\oauth*.json \\\\wsl$\\Ubuntu\\home\\mataanek\\.hermes\\.garminconnect\\`\\\\n- From WSL bash: `cp /mnt/c/Users/mataa/.garminconnect/oauth*.json /home/mataanek/.hermes/.garminconnect/`\\\\n\\\\n**Never copy unverified tokens.** Always run verification on the Windows host (where tokens were generated) before copying to WSL.\\\\n\\\\n### 4. Running the Persistent Connection
 
 ```python
 # garmin_persistent.py
@@ -212,7 +205,180 @@ If you need true push notifications (not polling):
 - Always treat token files like passwords - they provide access to your Garmin data
 - If you revoke access in Garmin Connect web interface, all tokens become invalid
 - The `garminconnect` library handles the OAuth dance automatically; you rarely need to interact with the raw tokens directly
+- For historical data analysis, the Garmin GDPR export contains rich JSON files under `DI_CONNECT/` that can be parsed for longitudinal trends (see "Historical Data Analysis" below)
+
+## Historical Data Analysis
+
+## Data Lake and Daily Trend Analysis
+
+For efficient repeated analysis, you can build a Parquet data lake from the raw Garmin GDPR export JSON files. This allows quick querying and trend computation without re-parsing all files each time.
+
+### Building the Data Lake
+
+Use the script `scripts/garmin_build_lake.py` to extract and aggregate data from the raw JSON files under `~/wiki/raw/garmin/` into a daily-level Parquet file at `~/data/garmin_lake/daily.parquet`. The lake includes columns for:
+
+- Resting HR (from wellness snapshots or sleep average HR)
+- Stress, SpO2, HRV (RMSSD/SDRR), respiration
+- Sleep metrics (deep/light/REM/awake minutes)
+- Workout metrics (steps, distance, duration, calories, avg/max/min HR, training effects, intensity minutes)
+- Derived high-intensity run flags and volumes (based on calories/min > 8.0 or training status PRODUCTIVE/PEAKING)
+
+The script handles merging multiple sources per day, filling missing resting HR from sleep data when wellness snapshots are missing, and computes daily aggregates.
+
+### Daily Trend Analysis
+
+Once the lake is built, you can compute daily correlations between resting HR and high-intensity run volume using `scripts/garmin_daily_trend.py`. This script:
+
+- Reads the Parquet lake
+- Computes a 30-day rolling Pearson correlation between resting HR and high-intensity run minutes
+- Appends/updates a `## Daily Resting HR vs High-Intensity Run Trend (Garmin)` section in `~/wiki/personal/health.md`
+- Shows the last 14 days with rolling correlation values
+
+### Visualizing Resting HR Trends
+
+To visualize resting HR development over arbitrary date ranges, use `scripts/plot_resting_hr_v2.py`. This script:
+
+- Reads the Parquet lake
+- Filters from a start date (default 2023-01-01) to today
+- Plots daily resting HR (blue) and a 7-day rolling average (red)
+- Saves the plot as `~/wiki/personal/garmin_resting_hr_2023_now_v2.png`
+
+### Automation
+
+You can schedule the lake build and trend update via cron jobs. For example, to rebuild the lake daily at 02:00 CET and update the trend at 02:30 CET:
+
+```
+0 2 * * * /home/mataanek/.hermes/skills/mlops/garmin-connect/scripts/garmin_build_lake.py
+30 2 * * * /home/mataanek/.hermes/skills/mlops/garmin-connect/scripts/garmin_daily_trend.py
+```
+
+Note: The lake build is only needed when new raw export files are added; if you export infrequently, a monthly update may suffice.
+
+See also the existing `garmin_persistent.py` script for live API polling if you prefer real-time data over historical analysis.
+
+When working with Garmin Connect GDPR exports (like those found in `~/wiki/raw/garmin/`), you can extract longitudinal health and workout trends by parsing the JSON files in the `DI_CONNECT/` directory.
+
+### Key Data Sources for Trend Analysis
+
+1. **Wellness Snapshots & Sleep Data** (`DI_CONNECT/DI-Connect-Wellness/`)
+   - `*_wellnessActivities.json`: Contains periodic health snapshots with:
+     * `calendarDate`: Date of measurement
+     * `summaryTypeDataList`: Array with objects for HEART_RATE (avg/min/max), RESPIRATION, STRESS, SPO2, RMSSD_HRV, SDRR_HRV
+   - `*_sleepData.json`: Contains nightly sleep metrics:
+     * `calendarDate`: Date of sleep
+     * `deepSleepSeconds`, `lightSleepSeconds`, `remSleepSeconds`, `awakeSleepSeconds`
+     * `sleepScores`: Overall, quality, duration, recovery, deep, rem, light scores
+     * `spo2SleepSummary`: averageSPO2, averageHR, lowestSPO2 (when available)
+
+2. **Workout/Activity Data** (`DI_CONNECT/DI-Connect-Fitness/` and `DI_CONNECT/DI-Connect-Fitness-VVFJR/`)
+   - `*_summarizedActivities.json`: Contains detailed workout summaries:
+     * `calendarDate`: Date of activity
+     * `activityType`: e.g., "walking", "running", "cycling"
+     * `sportType`: e.g., "STEPS", "CYCLING"
+     * `duration`: Activity duration in milliseconds
+     * `distance`: Distance in meters
+     * `steps`: Step count (0 for non-stepping activities)
+     * `calories`: Total calories burned
+     * `avgSpeed`, `maxSpeed`: Speed in m/s
+     * `elevationGain`, `elevationLoss`: Elevation in meters
+
+3. **Training Status & Metrics** (`DI_CONNECT/DI-Connect-Metrics/`)
+   - `*_TrainingHistory_*.json`: Daily training status:
+     * `calendarDate`: Date
+     * `sport`: e.g., "RUNNING"
+     * `trainingStatus`: e.g., "RECOVERY", "MAINTAINING", "PRODUCTIVE"
+     * `fitnessLevelTrend`: e.g., "NO_CHANGE", "IMPROVING"
+   - `*_MetricsAcuteTrainingLoad_*.json`: Day-to-day training load
+   - `*_EnduranceScore_*.json`: Endurance score time series
+
+### Correlation Analysis Pattern
+
+To correlate resting HR trends with high-intensity running (as requested in this session):
+
+1. **Extract Daily Resting HR**:
+   - Prefer wellness snapshots: find `summaryTypeDataList` entry where `summaryType` = "HEART_RATE", use `avgValue`
+   - Fallback: use `averageHR` from `spo2SleepSummary` in sleep data when wellness snapshot missing
+
+2. **Extract Daily High-Intensity Running**:
+   - From summarized activities: filter for `activityType` = "running"
+   - Calculate intensity: `calories` / (`duration` / 60000) → kcal/minute
+   - Define high-intensity as intensity > 8.0 kcal/min (adjust based on fitness level)
+   - Sum either count of high-intensity runs or total duration per day
+
+3. **Aggregate to Weekly**:
+   - Group daily data by ISO week (year, week)
+   - Calculate weekly average resting HR
+   - Sum weekly high-intensity run counts or durations
+
+4. **Compute Correlation**:
+   - Use Pearson correlation between weekly average resting HR and weekly high-intensity volume
+   - Significant negative correlation suggests higher training load leads to elevated resting HR (potential overreaching)
+   - Significant positive correlation suggests fitness improvements (more training capacity with lower resting HR)
+
+### Example Extraction Logic
+
+```python
+import json
+import glob
+from datetime import datetime
+import statistics
+
+def extract_daily_resting_hr(json_path):
+    """Extract resting HR from wellness snapshot or sleep data"""
+    with open(json_path) as f:
+        data = json.load(f)
+    
+    # Try wellness snapshot first
+    if isinstance(data, list):
+        for entry in data:
+            if entry.get("calendarDate") == target_date:
+                for summary in entry.get("summaryTypeDataList", []):
+                    if summary.get("summaryType") == "HEART_RATE":
+                        return summary.get("avgValue")
+    
+    # Fallback to sleep data
+    if isinstance(data, list):
+        for entry in data:
+            if entry.get("calendarDate") == target_date:
+                spo2_summary = entry.get("spo2SleepSummary", {})
+                return spo2_summary.get("averageHR")
+    return None
+
+def extract_daily_high_intensity_runs(json_path):
+    """Extract high-intensity run count from summarized activities"""
+    with open(json_path) as f:
+        data = json.load(f)
+    
+    high_intense_count = 0
+    if isinstance(data, list):
+        for activity in data:
+            if activity.get("calendarDate") == target_date and \
+               activity.get("activityType") == "running":
+                duration_min = activity.get("duration", 0) / 60000
+                if duration_min > 0:
+                    intensity = activity.get("calories", 0) / duration_min
+                    if intensity > 8.0:  # kcal/min threshold
+                        high_intense_count += 1
+    return high_intense_count
+```
+
+### Daily Trend Analysis (Alternative to Weekly)
+
+For applications requiring daily granularity (e.g., tracking day-to-day readiness), you can compute a rolling correlation or simply plot the daily time series. The following approach yields a daily signal:
+
+1. **Extract Daily Resting HR** as described above (prefer wellness snapshot, fallback to sleep average HR).
+2. **Extract Daily High‑Intensity Running Volume**: sum either the count or total duration of runs where intensity (calories/min) > threshold.
+3. **Compute a rolling correlation** (e.g., 30‑day window) between the two daily series to observe how the relationship evolves over time.
+4. **Plot both series** with dual axes to visually inspect alignment.
+
+An example script that implements this daily analysis and updates the health wiki is available in the skill’s `scripts/` directory as `garmin_daily_trend.py`. It reads the Garmin data lake (built via `garmin_build_lake.py`), calculates a 30‑day rolling Pearson correlation between resting HR and high‑intensity run minutes, and appends a formatted section to `/home/mataanek/.hermes/wiki/personal/health.md`.
+
+See also the plotting script `plot_resting_hr_v2.py` for visualizing resting HR trends over arbitrary date ranges.
+
+
+This approach allows you to build longitudinal trends from historical Garmin exports without relying solely on the live API, enabling deeper analysis of fitness patterns over months or years.
 
 ---
 
-## References\\n- GarminConnect Python Library: https://pypi.org/project/garminconnect/\\n- Garmin Connect API Documentation (unofficial): Various community resources\\n- OAuth 2.0 Refresh Token Flow: Standard OAuth 2.0 specification\\n\\n## Related Skills\\n- `hermes-agent`: For configuring and extending the Hermes Agent framework itself\\n\\n## Support Files\\n- references/interactive_login_one_liner.md: One-liner for initial TTY-based login with SMS 2FA handling (includes robust CSRF token extraction)\\n- references/token_format.md: Example structure of oauth1_token.json and oauth2_token.json files\\n- references/token_directory.md: Guidance on handling custom token locations in different environments\\n- references/token_handling.md: Details on how the garminconnect library stores and manages tokens
+## Support Files\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- references/interactive_login_one_liner.md: One-liner for initial TTY-based login with SMS 2FA handling (includes robust CSRF token extraction)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- references/token_format.md: Example structure of oauth1_token.json and oauth2_token.json files\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- references/token_directory.md: Guidance on handling custom token locations in different environments\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- references/token_handling.md: Details on how the garminconnect library stores and manages tokens\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- references/token_verification.md: CRITICAL - Step-by-step guide to validate tokens before copying (MUST be used)\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- references/wellness_data_structure.md: Empirical analysis of Garmin wellness/sleep JSON structure - shows exact paths for HRV, stress, and resting HR extraction
+- references/hrv_stress_extraction.md: Detailed guide on extracting HRV (RMSSD_HRV, SDRR_HRV) and stress values from wellness snapshots\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- references/health_status_data_structure.md: Structure of *_healthStatusData.json files containing weekly averaged HRV and other metrics\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- references/hrv_stress_extraction.md: Detailed guide on extracting HRV (RMSSD_HRV, SDRR_HRV) and stress values from wellness snapshots\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- scripts/garmin_daily_trend.py: Script to compute daily rolling correlation between resting HR and high-intensity run minutes and update the health wiki\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- scripts/garmin_build_lake.py: Script to build the Garmin data lake (Parquet) from raw GDPR export JSON files\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n- scripts/plot_resting_hr_v2.py: Script to plot resting HR trends over a specified date range |

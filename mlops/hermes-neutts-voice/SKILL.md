@@ -77,6 +77,13 @@ If you see "NeuTTS synthesis failed: Error: reference text not found" in the err
 - The reference text is case-sensitive and must include exact punctuation
 - To fix: either update the ref_text in config.yaml to match your reference audio transcript, or re-run `cache_neutts_ref.py` with the correct transcript
 
+### Incorrect profile directory resolution
+If you see errors like "Reference codes not found at: /home/mataanek/.hermes/home/.hermes/profiles/nix/ref_codes.pt" (note the extra `.hermes` in the path):
+- This happens when the HOME environment variable is set to a non-standard location (e.g., HOME=/home/mataanek/.hermes/home)
+- The TTS scripts use `os.path.expanduser("~/.hermes/profiles")` which resolves to $HOME/.hermes/profiles
+- To fix: Set `HERMES_PROFILES_DIR=/home/mataanek/.hermes/profiles` in your environment before running the TTS command
+- Example: `HERMES_PROFILES_DIR=/home/mataanek/.hermes/profiles HERMES_ACTIVE_PROFILE=nix /path/to/hermes_neutts_tts.py input.txt output.wav`
+
 ### IndexError: list index out of range in _to_phones
 If you see an IndexError in the TTS provider's `_to_phones` method (from the neutts package) with the message:
 `IndexError: list index out of range`

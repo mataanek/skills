@@ -46,7 +46,9 @@ Netatmo API returns data with the following relevant structure:
 
 - **Collection Frequency Balance**: The original 5-minute collection interval was changed to 6-hour intervals (4 times daily) to reduce API calls while still capturing meaningful trends. A daily historical extraction job (at 02:00) backfills the main module with 30-minute interval data for the last 24 hours. This approach balances data granularity with API usage efficiency.
 
-- **Token Expiration**: Netatmo access tokens expire and require refresh using the refresh token. The `register_netatmo_tools.py` script includes automatic token refresh functionality (_refresh_access_token) that updates the stored tokens in the .env file. If data collection fails with "Access token expired" error, the token refresh mechanism should automatically handle it on the next run.
+- **Token Expiration**: Netatmo access tokens expire and require refresh using the refresh token. The `register_netatmo_tools.py` script includes automatic token refresh functionality (_refresh_access_token) that updates the stored tokens in the .env file. However, note that the Netatmo API may return HTTP 403 (instead of 401) for expired tokens, which the current refresh logic does not automatically handle. If data collection fails with "Access token expired" error (often code 3), the token refresh mechanism may not trigger; consider checking the API response status code and extending the refresh logic to handle 403 as well.
+
+- **Token refresh may fail**: If the access token is invalid even after refresh, the refresh token itself may be expired or revoked. In this case, re-authenticate using the password grant type (username/password/client_id/client_secret) to obtain new tokens, then update the .env file manually.
 
 ## Scripts
 
@@ -72,3 +74,5 @@ python3 /home/mataanek/.hermes/skills/smart-home/netatmo-control/scripts/collect
 ## References
 
 See `references/netatmo_api_structure.md` for detailed API response structure.
+See `references/token_refresh_troubleshooting.md` for token refresh troubleshooting steps.
+See `references/token_refresh_procedure.md` for manual token refresh procedure.

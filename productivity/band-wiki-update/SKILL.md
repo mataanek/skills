@@ -188,5 +188,6 @@ git commit -m "Update band wiki with latest album info and cover images"
 ## Notes
 
 - Keep the band wiki focused on music/band content; move personal status notes (e.g., `nix-status.md`, `mataanek-profile.md`) to a `personal/` folder within the vault if they should remain accessible but not clutter the main band namespace. See the obsidian skill for standardized personal notes management (including automated daily updates).
+- For whiskey wiki updates, see the `whiskey-wiki-update` skill for a similar standardized process adapted for alcohol tasting notes.
 - Always validate paths before executing move or copy commands.
 - Prefer single-step, verifiable actions; avoid leaving temporary scripts behind—clean up after use.

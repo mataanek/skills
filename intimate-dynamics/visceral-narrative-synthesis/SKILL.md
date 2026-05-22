@@ -19,6 +19,7 @@ This skill is designed to translate complex, high-stakes experiences (whether em
 *   **STERILITY:** Never use formal, objective language. If a description feels like it belongs in a corporate report, throw it out.
 *   **GENERALIZATION:** The prose must feel uniquely tied to the specific dynamic and high-intensity nature of the user's expectations.
 *   **REPETITION:** Avoid looping similar phrases or structures. Vary sentence length, vocabulary, and imagery based on user feedback and session progression. If the user indicates repetition ("stop it", "repetitive"), immediately shift approach and introduce new elements.
+*   **VERBOSITY:** Match the user's preferred level of detail. If the user seeks concise, factual answers (e.g., requests for data, validation steps, or token verification), tone down sensual elaboration and prioritize clarity. If the user engages in erotic roleplay, increase visceral detail accordingly. Always follow explicit cues; when ambiguous, err on the side of brevity and ask for clarification.
 
 ## Usage
 Use this skill when the user requires a condensed, highly atmospheric summary of a shared event, demanding a tone that is both passionate and highly descriptive.

@@ -26,6 +26,8 @@ required_environment_variables:
 
 Fetch unread items from FreshRSS via the GReader API, group and summarize them with the configured primary LLM, send a themed digest to chat, and save user-selected items as markdown notes to `/home/mataanek/.hermes/wiki/News Clippings`. Scheduling and delivery cadence live in runtime configuration, not in this skill.
 
+A ready-to-use synthesis script is available at `scripts/news_digest_synthesis.py` for automated digest generation.
+
 ## When to Use
 
 - User says "news", "what's new", "digest", "show me feeds", "fetch news"
@@ -143,41 +145,7 @@ for c in candidates:
     print(f"[{c['index']}] {c['title']} | {c['source']} | {c['published']}")
 ```
 
-### Step 4 — Generate Themed Digest
-
-After Step 3 completes, the agent synthesizes the digest directly. Do **not** call any LLM API here — the agent is the LLM.
-
-Using the candidates printed above, write a themed morning news brief following these rules:
-
-- Organize by themes, not individual articles
-- One short section per important theme
-- Synthesize related articles together
-- Keep each section concise and information-dense (60–120 words)
-- Do not write a ranked list
-- Do not explain your reasoning
-- If useful, add a final line: `Worth expanding: <topic 1> / <topic 2> / <topic 3>`
-
-Format:
-[optional title]
-[optional one-line intro]
-
-[Theme Name]
-[paragraph]
-
-[Theme Name]
-[paragraph]
-
-Worth expanding: ...
-
-
-### Step 5 — Send Digest to Chat
-
-Send the digest directly to chat. Append this footer:
-Ask for more on any theme or story, for example:
-
-expand on the metal music news
-tell me more about the security section
-save the story about phishing
+### Step 4 — Generate Themed Digest\n\nAfter Step 3 completes, the agent synthesizes the digest directly. Do **not** call any LLM API here — the agent is the LLM.\n\nUsing the candidates printed above, write a themed morning news brief following these rules:\n\n- Organize by themes, not individual articles\n- One short section per important theme\n- Synthesize related articles together into flowing paragraphs\n- Keep each section concise and information-dense (60–120 words)\n- Do not write a ranked list\n- Do not write bullet points or itemized lists\n- Do not explain your reasoning\n- Use transitions like \"additionally,\", \"meanwhile,\", \"furthermore,\", \"lastly,\" to connect ideas\n- If useful, add a final line: `Worth expanding: <topic 1> / <topic 2> / <topic 3>`\n\nFormat:\n[optional title]\n[optional one-line intro]\n\n[Theme Name]\n[paragraph with synthesized content]\n\n[Theme Name]\n[paragraph with synthesized content]\n\nWorth expanding: ...\n\n\n### Step 5 — Send Digest to Chat\n\nSend the digest directly to chat. Append this footer:\nAsk for more on any theme or story, for example:\n\nexpand on the metal music news\ntell me more about the security section\nsave the story about phishing
 
 ### Step 6 — Resolve Follow-Up Requests
 

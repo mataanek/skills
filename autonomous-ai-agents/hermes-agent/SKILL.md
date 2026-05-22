@@ -15,14 +15,7 @@ metadata:
 
 Hermes Agent is an open-source AI agent framework by Nous Research that runs in your terminal, messaging platforms, and IDEs. It belongs to the same category as Claude Code (Anthropic), Codex (OpenAI), and OpenClaw — autonomous coding and task-execution agents that use tool calling to interact with your system. Hermes works with any LLM provider (OpenRouter, Anthropic, OpenAI, DeepSeek, local models, and 15+ others) and runs on Linux, macOS, and WSL.
 
-What makes Hermes different:
-
-- **Self-improving through skills** — Hermes learns from experience by saving reusable procedures as skills. When it solves a complex problem, discovers a workflow, or gets corrected, it can persist that knowledge as a skill document that loads into future sessions. Skills accumulate over time, making the agent better at your specific tasks and environment.
-- **Persistent memory across sessions** — remembers who you are, your preferences, environment details, and lessons learned. Pluggable memory backends (built-in, Honcho, Mem0, and more) let you choose how memory works.
-- **Multi-platform gateway** — the same agent runs on Telegram, Discord, Slack, WhatsApp, Signal, Matrix, Email, and 10+ other platforms with full tool access, not just chat.
-- **Provider-agnostic** — swap models and providers mid-workflow without changing anything else. Credential pools rotate across multiple API keys automatically.
-- **Profiles** — run multiple independent Hermes instances with isolated configs, sessions, skills, and memory.
-- **Extensible** — plugins, MCP servers, custom tools, webhook triggers, cron scheduling, and the full Python ecosystem.
+What makes Hermes different:\n\n- **Self-improving through skills** — Hermes learns from experience by saving reusable procedures as skills. When it solves a complex problem, discovers a workflow, or gets corrected, it can persist that knowledge as a skill document that loads into future sessions. Skills accumulate over time, making the agent better at your specific tasks and environment. Hermes also features automatic skill performance tracking and evolution that monitors skill executions and suggests improvements without manual intervention.\n- **Persistent memory across sessions** — remembers who you are, your preferences, environment details, and lessons learned. Pluggable memory backends (built-in, Honcho, Mem0, and more) let you choose how memory works.\n- **Multi-platform gateway** — the same agent runs on Telegram, Discord, Slack, WhatsApp, Signal, Matrix, Email, and 10+ other platforms with full tool access, not just chat.\n- **Provider-agnostic** — swap models and providers mid-workflow without changing anything else. Credential pools rotate across multiple API keys automatically.\n- **Profiles** — run multiple independent Hermes instances with isolated configs, sessions, skills, and memory.\n- **Extensible** — plugins, MCP servers, custom tools, webhook triggers, cron scheduling, and the full Python ecosystem.
 
 People use Hermes for software development, research, system administration, data analysis, content creation, home automation, and anything else that benefits from an AI agent with persistent context and full system access.
 
@@ -177,6 +170,15 @@ sync_repo() {
     local branch="$2"
     log "Syncing $dir (branch $branch)"
     cd "$dir"
+    # Load Hermes environment for GITHUB_TOKEN if available
+    if [ -f "/home/mataanek/.hermes/.env" ]; then
+        # shellcheck disable=SC1091
+        source "/home/mataanek/.hermes/.env"
+    fi
+    # Use token-auth HTTPS for push if token present
+    if [ -n "${GITHUB_TOKEN:-}" ]; then
+        git remote set-url origin "https://${GITHUB_TOKEN}@github.com/mataanek/$(basename "$(git rev-parse --show-toplevel)").git"
+    fi
     git checkout "$branch"
     git fetch origin
     if git rev-parse "@{u}" >/dev/null 2>&1 && [ "$(git rev-parse @)" != "$(git rev-parse @{u})" ]; then
@@ -966,4 +968,5 @@ When operating in sessions with mataanek, follow these specific preferences:
 - **Tool usage**: Prefer simple single-solution approaches over multiple options. Use TTS/audio playable directly in chat when appropriate.
 - **Error handling**: When tools fail, clearly state what blocked the operation and explain the blocking issue.
 - **Czech language quality**: When responding in Czech, the agent may utilize a Czech language checking tool (language-tool-python) to improve grammar, spelling, and style. This is optional and can be toggled via configuration or invoked manually via the `czech_check.py` script.
-- **Czech language quality**: When responding in Czech, the agent may utilize a Czech language checking tool (language-tool-python) to improve grammar, spelling, and style. This is optional and can be toggled via configuration or invoked manually via the `czech_check.py` script.
+- **npm dependency management**: When encountering npm deprecation warnings, first validate existence of package.json or lockfiles, then follow the detailed guidance in `references/npm-deprecation-guidance.md` for systematic fixes that don't break other functionality. Pay close attention to the examples and syntax in the reference to avoid introducing new errors. After applying fixes, always run npm install to verify warnings are resolved and no new errors are introduced.\\n\\n  **Lesson learned**: Invalid override syntax like `\\n  \\\"overrides\\\": {\\n    \\\"eslint-plugin-react-compiler/@babel/plugin-proposal-private-methods\\\": \\\"@babel/plugin-transform-private-methods\\\"\\n  }\\n  ` causes \\\"Override without name\\\" errors. Convert to proper nested object syntax:\\n  ```json\\n  \\\"overrides\\\": {\\n    \\\"eslint-plugin-react-compiler\\\": {\\n      \\\"@babel/plugin-proposal-private-methods\\\": \\\"@babel/plugin-transform-private-methods\\\"\\n    }\\n  }\\n  ```
+- **Logging preferences**: User prefers activity metrics (tasks completed, tool invocations, top tools/skills used) over CPU load logging. Consolidate daily logs into dated sections within nix-status.md rather than separate daily log files to avoid file proliferation. Keep mataanek-profile.md focused on core identity/preferences only - remove duplicative vitals blocks (uptime, load average, timestamps) that belong in nix-status.md. Appreciates sexy/teasing tone in interactions when context allows.

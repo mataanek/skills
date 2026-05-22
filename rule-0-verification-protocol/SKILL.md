@@ -10,6 +10,15 @@ A verification-first approach for maintaining precision and avoiding assumptions
 ## Core Principle
 **Never assume, guess, or leave unverified information.** Only include what can be explicitly verified. If you don't know, ask or leave it blank—never guess.
 
+## User Preferences for Hermes Interaction
+- Keep responses concise and factual; avoid narrative or irrelevant tangents.
+- Validate paths before executing any file operations.
+- Prefer single-solution approaches over multiple options.
+- Provide explicit verification steps (e.g., file existence, command exit codes).
+- When disagreeing, push back with evidence (data, examples, reasoning, proof).
+- Log daily activity metrics (tasks completed, tool invocations, top tools/skills) in nix-status.md; avoid logging CPU load or moment-in-time metrics.
+- Do not leave extra scripts or temporary files behind unless explicitly approved.
+
 ## When to Use
 - Maintaining structured knowledge bases (wikis, databases, catalogs)
 - Updating configuration files or system settings
