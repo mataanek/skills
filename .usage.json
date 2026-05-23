@@ -237,12 +237,12 @@
     "created_at": "2026-05-16T19:28:29.477850+00:00",
     "created_by": "agent",
     "last_patched_at": "2026-05-21T10:30:13.343889+00:00",
-    "last_used_at": "2026-05-22T16:00:29.048888+00:00",
+    "last_used_at": "2026-05-23T10:00:06.147976+00:00",
     "last_viewed_at": "2026-05-21T10:26:00.859069+00:00",
     "patch_count": 15,
     "pinned": false,
     "state": "active",
-    "use_count": 41,
+    "use_count": 42,
     "view_count": 16
   },
   "nix-image-generation-protocol": {
