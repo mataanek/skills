@@ -171,7 +171,7 @@ def _make_netatmo_request(endpoint, params=None):
         response = requests.get(url, headers=headers, params=params, timeout=10)
         if response.status_code == 200:
             return {"output": response.json()}
-        elif response.status_code == 401:
+        elif response.status_code == 401 or response.status_code == 403:
             # Token might be expired, try to refresh once
             refresh_result = _refresh_access_token()
             if "error" not in refresh_result:
@@ -184,7 +184,7 @@ def _make_netatmo_request(endpoint, params=None):
                 else:
                     return {"error": f"API request failed after token refresh: {response.status_code} {response.text}"}
             else:
-                return {"error": f"API request failed (401) and token refresh failed: {refresh_result.get('error')}"}
+                return {"error": f"API request failed ({response.status_code}) and token refresh failed: {refresh_result.get('error')}"}
         else:
             return {"error": f"API request failed: {response.status_code} {response.text}"}
     except Exception as e:

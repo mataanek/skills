@@ -1,4 +1,16 @@
-# Key Learnings from Netatmo Integration Session (2026-05-16)
+# Key Learnings from Netatmo Integration Sessions
+
+## Session 2026-05-16
+- **Module ID Limitations for Historical Data**: Historical data extraction works for main module but not individual modules via public API
+- **Collection Frequency Optimization**: 6-hour intervals for current data + daily historical backfill balances granularity with API usage
+- **Data Storage Structure**: JSON Lines log, individual sensor files, daily summaries, and historical files for main module
+- **Cron Job Configuration**: netatmo-data-collection (0 */6 * * *) and netatmo-daily-historical (0 2 * * *)
+
+## Session 2026-05-23
+- **Token Expiration Handling**: Netatmo API returns HTTP 403 (not just 401) for expired tokens
+- **Fix Applied**: Updated register_netatmo_tools.py to handle both 401 and 403 responses in _make_netatmo_request
+- **Verification**: After fix, token refresh succeeded and data collection completed successfully
+- **Historical Data Extraction**: extract_daily_historical.py works correctly for main module metrics at 30-minute intervals
 
 ## Module ID Limitations for Historical Data
 - **Main Module**: Historical data extraction works correctly using station ID as device_id in getdevice/measures calls
