@@ -58,6 +58,9 @@ If you're not hearing the audio directly in your chat interface (seeing it as a 
 - The voice_compatible flag is set to true in the config, which is required for inline playback in supported platforms.
 - For platform-specific quirks (e.g., Telegram), see references/telegram.md.
 
+### Verification commands
+For verified, working commands to generate clear TTS audio (especially when experiencing muffled or unclear output), see references/verification_commands.md.
+
 ### Profile files not found
 If you see errors like "Reference audio not found at: /home/mataanek/.hermes/home/.hermes/profiles/nix/nix.wav" or "Reference codes not found at: .../ref_codes.pt":
 - The skill expects profile data under `~/.hermes/profiles/<profile>/`.

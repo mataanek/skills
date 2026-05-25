@@ -119,7 +119,7 @@ def normalize_text(text: str) -> str:
     text = re.sub(r'\*(.+?)\*',     r'\1', text)                     # *italic*
     text = re.sub(r'__(.+?)__',     r'\1', text)                     # __bold__
     text = re.sub(r'_(.+?)_',       r'\1', text)                     # _italic_
-    text = re.sub(r'`{1,3}.*?`{1,3}', '', text, flags=re.DOTALL)    # `code`
+    text = re.sub(r'`{1,3}.*?`{1,3}', '', text, flags=re.DOTALL)     # `code`
     text = re.sub(r'#+\s*',         '',    text)                     # ## headers
     text = re.sub(r'^\s*[-*]\s+',   '',    text, flags=re.MULTILINE) # list items
 
@@ -257,13 +257,19 @@ if not os.path.exists(CODES_PATH):
     )
     sys.exit(1)
 
-data      = torch.load(CODES_PATH, map_location="cpu")
+data = torch.load(CODES_PATH, map_location="cpu")
 ref_codes = data["ref_codes"]
-# HERMES: DO NOT CHANGE — ref_text is intentionally NOT passed to tts.infer().
-# NeuTTS uses ref_text as a phoneme-level prefix prompt, causing the reference
-# transcript (the Tel Aviv sentence) to be spoken aloud before every batch.
-# Voice characteristics are fully captured in ref_codes from encode_reference().
-# Passing ref_text to infer() is the wrong fix — leave the empty string below.
+ref_text = str(data.get("ref_text", "")).strip()
+
+if not ref_text:
+    print(
+        f"ERROR: ref_text missing from cached profile: {CODES_PATH}\n"
+        f"NeuTTS Air expects the transcript of the reference audio.\n"
+        f"Regenerate the profile so ref_codes.pt contains both "
+        f"'ref_codes' and 'ref_text'.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 # Load NeuTTS once — suppress llama_cpp stderr noise
 # HERMES: DO NOT CHANGE — suppress_stderr() is intentional, see top of file.
@@ -281,10 +287,8 @@ sentence_gap   = np.zeros(gap_samples, dtype=np.float32)
 audio_segments = []
 
 for i, batch in enumerate(batches):
-    # HERMES: DO NOT CHANGE — empty string as ref_text is intentional.
-    # See comment above torch.load() for full explanation.
     with suppress_stderr():
-        wav = tts.infer(batch, ref_codes, " ")
+        wav = tts.infer(batch, ref_codes, ref_text)
     audio_segments.append(wav.astype(np.float32))
     if i < len(batches) - 1:
         audio_segments.append(sentence_gap)
